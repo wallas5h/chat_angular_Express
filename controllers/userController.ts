@@ -113,9 +113,6 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const logoutUser = async (req: any, res: Response) => {
-  // const { newMessages } = req.body;
-  // console.log(req.body.id);
-
   const user = req.user;
 
   if (!user) {
@@ -153,10 +150,28 @@ export const getUsers = async (req: Request, res: Response) => {
   });
 };
 
+export const findByName = async (req: any, res: Response) => {
+  const name = String(req.body.name).toLocaleLowerCase();
+  const userId = req.user._id.toString();
+
+  const results = await User.find()
+    .and([{ name: { $regex: name } }, { _id: { $ne: userId } }])
+    .limit(5);
+
+  if (results.length === 0) {
+    return res.status(404).json({
+      error: "no results",
+    });
+  }
+
+  res.status(200).json({
+    users: exportedMembersData(results),
+  });
+};
+
 const exportedMembersData = (members: any[]) => {
   return members.map(({ _id, email, name, image, status }) => ({
     _id,
-    email,
     name,
     image,
     status,
