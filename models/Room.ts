@@ -6,13 +6,26 @@ const roomSchema = new mongoose.Schema({
     lowercase: true,
     required: [true, "Please add a name"],
   },
+  createdBy: {
+    id: String,
+    name: String,
+  },
   type: {
     type: String,
   },
-  members: [
+  isActive: {
+    type: Boolean,
+  },
+  dislikeMembers: [
     {
       type: String,
       ref: "User",
+    },
+  ],
+  members: [
+    {
+      id: String,
+      name: String,
     },
   ],
 });
