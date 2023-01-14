@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  findByName,
   getUsers,
   loginUser,
   logoutUser,
@@ -13,4 +14,5 @@ userRouter
   .get("/", authMiddleware, getUsers)
   .post("/signup", signupUser)
   .post("/login", loginUser)
-  .post("/logout", authMiddleware, logoutUser);
+  .delete("/logout", authMiddleware, logoutUser)
+  .post("/find", authMiddleware, findByName);
