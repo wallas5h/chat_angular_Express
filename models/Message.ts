@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
   content: String,
+  contentType: String,
   from: Object,
-  sockedId: String,
+  isActive: Boolean,
   time: String,
   date: String,
   to: String,
