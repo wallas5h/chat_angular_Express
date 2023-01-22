@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import { config } from "./config/config";
 import { connectDB } from "./config/db";
 import { socketService } from "./controllers/socketService";
+import { messagesRouter } from "./routes/messagesRouter";
 import { roomsRouter } from "./routes/roomsRouter";
 import { userRouter } from "./routes/userRouter";
 require("dotenv").config();
@@ -38,6 +39,7 @@ export const io = new Server(httpServer, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+  transports: ["websocket", "polling"],
 });
 
 app.use(cors(corsOptions));
@@ -61,6 +63,7 @@ socketService(io);
 //routing
 app.use("/api/users", userRouter);
 app.use("/api/rooms", roomsRouter);
+app.use("/api/messages", messagesRouter);
 
 //error middleware
 // app.use(errorHandler);
