@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { Message } from "../models/Message";
-import { User } from "../models/User";
+import { MessageTypes } from "../types/message";
 
 export interface MessageDto {
   _id: string;
@@ -17,11 +17,13 @@ export let exportSocket: any;
 export const socketService = async (io: Server) => {
   await io.on("connection", (socket) => {
     exportSocket = socket;
+
     socket.on("new-user", async () => {
       console.log("działa socket new-user");
-      const members = await User.find();
-      console.log(members);
-      io.emit("new-user", members);
+      // const members = await User.find();
+      // console.log(members);
+      // io.emit("new-user", members);
+      socket.emit("new-user", "działa");
     });
 
     socket.on("join-room", async (room: string) => {
@@ -31,25 +33,37 @@ export const socketService = async (io: Server) => {
       socket.emit("room-messages", roomMessages);
     });
 
-    socket.on("message-room", async (room, content, sender, time, date) => {
-      const newMessage = await new Message({
+    socket.on(
+      "message-room",
+      async (
+        room,
         content,
-        date,
-        from: sender,
-        sockedId: "",
+        contentType = MessageTypes.text,
+        sender,
         time,
-        to: room,
-      });
+        date
+      ) => {
+        const newMessage = await new Message({
+          content,
+          contentType,
+          date,
+          isActive: true,
+          from: sender,
+          sockedId: "",
+          time,
+          to: room,
+        });
 
-      await newMessage.save();
+        await newMessage.save();
 
-      let roomMessages = await getLastMessagesFromRoom(room);
-      const sortedRoomMessages = sortMessagesByDate(roomMessages);
+        let roomMessages = await getLastMessagesFromRoom(room);
+        const sortedRoomMessages = sortMessagesByDate(roomMessages);
 
-      io.to(room).emit("room-messages", sortedRoomMessages);
+        io.to(room).emit("room-messages", sortedRoomMessages);
 
-      socket.broadcast.emit("notifications", room);
-    });
+        socket.broadcast.emit("notifications", room);
+      }
+    );
   });
 };
 
@@ -58,6 +72,7 @@ export const getLastMessagesFromRoom = async (
 ): Promise<MessageDto[]> => {
   let roomMessages = await Message.aggregate([
     { $match: { to: room } },
+    { $match: { isActive: true } },
     { $group: { _id: "$date", messagesByDate: { $push: "$$ROOT" } } },
   ]);
   return roomMessages;
