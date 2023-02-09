@@ -17,6 +17,19 @@ export const getRooms = async (req: any, res: Response) => {
   res.json({ rooms: rooms });
 };
 
+export const getOneRoom = async (req: any, res: Response) => {
+  const userId = req.user._id.toString();
+  const roomId = req.params.id;
+  const room = await Room.findOne({ _id: roomId });
+
+  if (!room) {
+    return res.status(404).json({
+      error: "no room",
+    });
+  }
+  res.status(200).json({ room: room });
+};
+
 export const createRoom = async (req: any, res: Response) => {
   const userId = req.user._id.toString();
   const userName = req.user.name;

@@ -4,6 +4,7 @@ import {
   addUserToRoomMembers,
   createRoom,
   disActiveRoom,
+  getOneRoom,
   getRooms,
   updateRoomData,
 } from "../controllers/roomsController";
@@ -13,6 +14,7 @@ export const roomsRouter = Router();
 
 roomsRouter
   .get("/", authMiddleware, getRooms)
+  .get("/:id", authMiddleware, getOneRoom)
   .post("/", authMiddleware, createRoom)
   .patch("/", authMiddleware, addUserToDislikeList)
   .delete("/:id", authMiddleware, disActiveRoom)
