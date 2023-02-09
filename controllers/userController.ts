@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { Socket } from "socket.io";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { User } from "../models/User";
+import { Dictionary } from "../types/message";
 import { UserStatus } from "../types/user.dto";
 import { generateHashedData, generateToken } from "../utils/logs";
-import { exportSocket } from "./socketService";
 
 export const signupUser = async (req: Request, res: Response) => {
   try {
@@ -126,19 +124,39 @@ export const logoutUser = async (req: any, res: Response) => {
 
   await user.save();
 
-  const members = await User.find();
-
-  const socket: Socket<
-    DefaultEventsMap,
-    DefaultEventsMap,
-    DefaultEventsMap,
-    any
-  > = exportSocket;
-
-  socket.broadcast.emit("new-user", exportedMembersData(members));
-
   res.status(200).json({
     message: "Logout successfully",
+  });
+};
+
+export const getNewMessages = async (req: any, res: Response) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(400).json({
+      invalid: "Invalid user id",
+    });
+  }
+
+  res.status(200).json({
+    // messages: user.newMessages ?? {},
+    newMessages: user.newMessages,
+  });
+};
+
+export const updateNewMessages = async (req: any, res: Response) => {
+  type userNewMessagesType = Dictionary<number> | { [index: string]: any };
+
+  const user = req.user;
+
+  const newMessages = req.body as userNewMessagesType;
+
+  user.newMessages = newMessages ?? {};
+  user.markModified("newMessages");
+  await user.save();
+
+  res.status(200).json({
+    messages: user.newMessages ?? {},
   });
 };
 
@@ -148,6 +166,20 @@ export const getUsers = async (req: Request, res: Response) => {
   res.status(200).json({
     users: exportedMembersData(members),
   });
+};
+
+export const getOneUser = async (req: any, res: Response) => {
+  const userId = req.params.id;
+  // const user = await User.findById(userId);
+  const user = await User.findOne({ _id: userId });
+
+  if (!user) {
+    return res.status(404).json({
+      error: "no user",
+    });
+  }
+
+  res.status(200).json({ user: exportedMembersData([user]) });
 };
 
 export const findByName = async (req: any, res: Response) => {
