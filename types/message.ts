@@ -4,3 +4,7 @@ export enum MessageTypes {
   video = "video",
   raw = "raw",
 }
+
+export interface Dictionary<Value> {
+  [param: string]: Value;
+}
