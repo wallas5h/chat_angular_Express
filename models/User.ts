@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     newMessages: {
-      type: Object,
+      type: Schema.Types.Mixed,
+      _id: false,
       default: {},
     },
     status: {
