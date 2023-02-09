@@ -1,4 +1,6 @@
 import { urlencoded } from "body-parser";
+
+// import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
@@ -64,6 +66,15 @@ socketService(io);
 app.use("/api/users", userRouter);
 app.use("/api/rooms", roomsRouter);
 app.use("/api/messages", messagesRouter);
+
+//Cloudinary
+export const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: config.cld_cloud_name,
+  api_key: config.cld_api_key,
+  api_secret: config.cld_secret_key,
+  secure: true,
+});
 
 //error middleware
 // app.use(errorHandler);
