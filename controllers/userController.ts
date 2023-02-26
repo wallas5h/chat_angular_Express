@@ -33,7 +33,7 @@ export const signupUser = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       image: image ? image : "",
-      status: UserStatus.online,
+      status: UserStatus.offline,
     });
 
     await user.save();
@@ -198,6 +198,27 @@ export const findByName = async (req: any, res: Response) => {
 
   res.status(200).json({
     users: exportedMembersData(results),
+  });
+};
+
+export const changeUserStatus = async (req: any, res: Response) => {
+  const user = req.user;
+  const { status } = req.body;
+  console.log("body status: ", status);
+
+  user.status =
+    status === UserStatus.online ? UserStatus.online : UserStatus.offline;
+
+  // await user.save();
+  try {
+    await user.save();
+  } catch (error) {
+  } finally {
+    console.log("działa zmiana statusu: ", user.name, " - ", user.status);
+  }
+
+  res.status(200).json({
+    status: user.status,
   });
 };
 
