@@ -5,7 +5,7 @@ import { Message } from "../models/Message";
 import { Room } from "../models/Room";
 import { User } from "../models/User";
 import { Dictionary, MessageTypes } from "../types/message";
-import { UserResponseDto } from "../types/user.dto";
+import { UserResponseDto, UserStatus } from "../types/user.dto";
 require("dotenv").config();
 const socketioJwt = require("socketio-jwt");
 
@@ -34,10 +34,6 @@ export const socketService = async (io: Server) => {
     exportSocket = socket;
 
     socket.on("new-user", async () => {
-      console.log("działa socket new-user");
-      // const members = await User.find();
-      // console.log(members);
-      // io.emit("new-user", members);
       socket.emit("new-user", "działa");
     });
 
@@ -112,7 +108,6 @@ export const socketService = async (io: Server) => {
         // send notification to database
         if (String(FECurrentRoomId).includes("-")) {
           const roomMembers = FECurrentRoomId.split("-");
-          console.log(roomMembers);
           roomMembers.forEach((member: any) => {
             if (member === sender.id) {
               return;
@@ -135,6 +130,27 @@ export const socketService = async (io: Server) => {
         }
       }
     );
+
+    socket.on("user-status", async ({ userId, status }) => {
+      const user = await User.findOne({
+        _id: userId,
+      });
+
+      if (!user) {
+        console.log("user-status not found");
+        return;
+      }
+
+      user.status =
+        status === UserStatus.online ? UserStatus.online : UserStatus.offline;
+
+      // await user.save();
+      try {
+        await user.save();
+      } catch (error) {
+      } finally {
+      }
+    });
   });
 };
 
@@ -179,8 +195,11 @@ export const sortMessagesByDate = (messages: any) => {
     let date1 = a._id.split("/");
     let date2 = b._id.split("/");
 
-    let date11 = date1[2] + date1[1] + date1[0];
-    let date22 = date2[2] + date2[1] + date2[0];
+    let date11: number =
+      Number(date1[2]) * 1 + Number(date1[1]) * 100 + Number(date1[0]) * 10000;
+    let date22: number =
+      Number(date2[2]) * 1 + Number(date2[1]) * 100 + Number(date2[0]) * 10000;
+
     return date11 < date22 ? -1 : 1;
   });
 };
