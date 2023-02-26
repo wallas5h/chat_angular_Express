@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  changeUserStatus,
   findByName,
   getNewMessages,
   getOneUser,
@@ -17,6 +18,7 @@ userRouter
   .get("/", authMiddleware, getUsers)
   .get("/messages", authMiddleware, getNewMessages)
   .get("/:id", authMiddleware, getOneUser)
+  .patch("/status", authMiddleware, changeUserStatus)
   .post("/signup", signupUser)
   .post("/login", loginUser)
   .post("/messages", authMiddleware, updateNewMessages)
