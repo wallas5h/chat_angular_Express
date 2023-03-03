@@ -19,6 +19,11 @@ export interface MessageDto {
   to: String;
 }
 
+interface sortedMessagesDto {
+  _id: string;
+  messagesByDate: MessageDto[];
+}
+
 export let exportSocket: any;
 
 export const socketService = async (io: Server) => {
@@ -181,8 +186,8 @@ export const updateUserNewMessages = async (
 
 export const getLastMessagesFromRoom = async (
   room: string
-): Promise<MessageDto[]> => {
-  let roomMessages = await Message.aggregate([
+): Promise<sortedMessagesDto[]> => {
+  let roomMessages: sortedMessagesDto[] = await Message.aggregate([
     { $match: { to: room } },
     { $match: { isActive: true } },
     { $group: { _id: "$date", messagesByDate: { $push: "$$ROOT" } } },
@@ -190,15 +195,19 @@ export const getLastMessagesFromRoom = async (
   return roomMessages;
 };
 
-export const sortMessagesByDate = (messages: any) => {
-  return messages.sort((a: MessageDto, b: MessageDto) => {
+export const sortMessagesByDate = (messages: sortedMessagesDto[]) => {
+  return messages.sort((a: sortedMessagesDto, b: sortedMessagesDto) => {
     let date1 = a._id.split("/");
     let date2 = b._id.split("/");
 
     let date11: number =
-      Number(date1[2]) * 1 + Number(date1[1]) * 100 + Number(date1[0]) * 10000;
+      Number(date1[0]) * 1 +
+      Number(date1[1]) * 1000 +
+      Number(date1[2]) * 100000;
     let date22: number =
-      Number(date2[2]) * 1 + Number(date2[1]) * 100 + Number(date2[0]) * 10000;
+      Number(date2[0]) * 1 +
+      Number(date2[1]) * 1000 +
+      Number(date2[2]) * 100000;
 
     return date11 < date22 ? -1 : 1;
   });
