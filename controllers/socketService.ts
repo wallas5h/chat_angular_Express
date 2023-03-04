@@ -149,7 +149,6 @@ export const socketService = async (io: Server) => {
       user.status =
         status === UserStatus.online ? UserStatus.online : UserStatus.offline;
 
-      // await user.save();
       try {
         await user.save();
       } catch (error) {
