@@ -3,6 +3,7 @@ export enum MessageTypes {
   image = "image",
   video = "video",
   raw = "raw",
+  emoji = "emoji",
 }
 
 export interface Dictionary<Value> {
