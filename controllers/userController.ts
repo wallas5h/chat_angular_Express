@@ -187,7 +187,8 @@ export const findByName = async (req: any, res: Response) => {
   const userId = req.user._id.toString();
 
   const results = await User.find()
-    .and([{ name: { $regex: name } }, { _id: { $ne: userId } }])
+    // .and([{ name: { $regex: name } }, { _id: { $ne: userId } }])
+    .and([{ name: { $regex: name } }])
     .limit(5);
 
   if (results.length === 0) {
