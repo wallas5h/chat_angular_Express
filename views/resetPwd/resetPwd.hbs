@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0 2rem;
+      line-height: 2rem;
+      font-weight: 600;
+      color: #444;
+    }
+
+    a {
+      color: black;
+      font-weight: 800;
+    }
+
+    .button {
+      display: flex;
+      justify-content: center;
+    }
+
+    button {
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background-color: white;
+    }
+
+    button a {
+      display: inline-block;
+      padding: 1rem;
+      border: 1px solid black;
+      background: #27ae60;
+    }
+
+    .bookshop {
+      font-size: 2rem;
+      color: #27ae60;
+      font-weight: 900;
+
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Hello,</h2>
+  <div> Forgot your password?</div>
+  <div> We received a request t reset the password for your account.</div>
+
+  <div style="margin-top: 1rem;">To reset your password, click on the button bellow:</div>
+  <div class="button"><button><a
+  style="display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid black;
+    background: #27ae60;
+    color: #fff;
+    text-transform: uppercase;"
+    href="{{link}}">Reset password</a></button></div>
+
+  <div style="margin-top: 1rem;">If you didn't request reset password, ignore this email. </div>
+  <div style="margin-top: 1rem;"> Thank you, </div>
+  <div class="bookshop">ChatMe</div>
+
+</body>
+
+</html>
