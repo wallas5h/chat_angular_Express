@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { config } from "../config/config";
 import { User } from "../models/User";
 import { Dictionary } from "../types/message";
 import { UserStatus } from "../types/user.dto";
 import { generateHashedData, generateToken } from "../utils/logs";
+import { sendMail } from "../utils/mailer";
+import { EmailSubject, EmailView } from "../utils/mailer.utils";
 
 export const signupUser = async (req: Request, res: Response) => {
   try {
@@ -34,31 +37,67 @@ export const signupUser = async (req: Request, res: Response) => {
       password: hashedPassword,
       image: image ? image : "",
       status: UserStatus.offline,
+      confirmed: false,
     });
 
     await user.save();
 
-    const token = generateToken(user._id);
-    const hashedData = generateHashedData(
-      user._id,
-      user.name,
-      user.email,
-      user.image,
-      user.newMessages
-    );
-    user.token = token;
-    user.status = UserStatus.online;
-    await user.save();
+    const confirmedLink = `${config.domainAddress}/users/confirm/${user._id}`;
+
+    sendMail(email, EmailSubject.register, EmailView.register, confirmedLink);
 
     res.status(200).json({
-      data: hashedData,
-      token: user.token,
+      email: user.email,
+      message: "Check your email to activate your account.",
     });
   } catch (e) {
     res.status(400).json({
       invalid: e,
     });
   }
+};
+
+export const confirmRegistration = async (req: Request, res: Response) => {
+  const userId = String(req.params.id);
+
+  if (!userId) {
+    return res.status(400).send("Error: Invalid id");
+  }
+
+  const newUser = await User.findOne({
+    _id: userId,
+  });
+
+  if (!newUser) {
+    return res.status(400).send("Error: Invalid id");
+  }
+
+  newUser.confirmed = true;
+  await newUser.save();
+
+  res.status(200).send("Thank you for confirming your account. ");
+};
+
+export const resendRegisterVerification = async (
+  req: Request,
+  res: Response
+) => {
+  const email = String(req.body.email);
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(400).send("Error: Invalid credencials");
+    return;
+  }
+
+  const confirmedLink = `${config.domainAddress}/users/confirm/${user._id}`;
+
+  sendMail(email, EmailSubject.register, EmailView.register, confirmedLink);
+
+  res.status(200).json({
+    message: "Check your email, we send you activation link.",
+  });
 };
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -84,6 +123,12 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!passMatch) {
       return res.status(400).json({
         invalid: "Invalid email or password",
+      });
+    }
+
+    if (!user.confirmed) {
+      return res.status(401).json({
+        invalid: "This account is not confirmed",
       });
     }
 
