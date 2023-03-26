@@ -8,6 +8,7 @@ import "express-async-errors";
 import { engine } from "express-handlebars";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
+import path from "path";
 import { Server } from "socket.io";
 import { config } from "./config/config";
 import { connectDB } from "./config/db";
@@ -69,9 +70,11 @@ app.use("/api/rooms", roomsRouter);
 app.use("/api/messages", messagesRouter);
 
 // handlebars
+const hbsPath = path.join(__dirname, "./views");
+
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
-app.set("views", "./views");
+app.set("views", hbsPath);
 
 //Cloudinary
 export const cloudinary = require("cloudinary").v2;
