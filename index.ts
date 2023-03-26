@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import "express-async-errors";
+import { engine } from "express-handlebars";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -66,6 +67,11 @@ socketService(io);
 app.use("/api/users", userRouter);
 app.use("/api/rooms", roomsRouter);
 app.use("/api/messages", messagesRouter);
+
+// handlebars
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", "./views");
 
 //Cloudinary
 export const cloudinary = require("cloudinary").v2;
