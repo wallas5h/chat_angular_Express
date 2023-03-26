@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { isValidObjectId } from "mongoose";
 import { config } from "../config/config";
 import { User } from "../models/User";
 import { Dictionary } from "../types/message";
@@ -47,12 +48,11 @@ export const signupUser = async (req: Request, res: Response) => {
     sendMail(email, EmailSubject.register, EmailView.register, confirmedLink);
 
     res.status(200).json({
-      email: user.email,
-      message: "Check your email to activate your account.",
+      message: "Check your email and activate your account.",
     });
   } catch (e) {
     res.status(400).json({
-      invalid: e,
+      invalid: "Error, try later.",
     });
   }
 };
@@ -61,7 +61,15 @@ export const confirmRegistration = async (req: Request, res: Response) => {
   const userId = String(req.params.id);
 
   if (!userId) {
-    return res.status(400).send("Error: Invalid id");
+    return res.status(400).render("partials/failed", {
+      message: "Invalid id",
+    });
+  }
+
+  if (!isValidObjectId(userId)) {
+    return res.status(400).render("partials/failed", {
+      message: "Invalid id",
+    });
   }
 
   const newUser = await User.findOne({
@@ -69,13 +77,21 @@ export const confirmRegistration = async (req: Request, res: Response) => {
   });
 
   if (!newUser) {
-    return res.status(400).send("Error: Invalid id");
+    return res.status(400).render("partials/failed", {
+      message: "Invalid id",
+    });
+  }
+
+  if (newUser.confirmed) {
+    return res.status(400).render("partials/failed", {
+      message: "Email has been confirmed before.",
+    });
   }
 
   newUser.confirmed = true;
   await newUser.save();
 
-  res.status(200).send("Thank you for confirming your account. ");
+  res.status(200).render("partials/confirmed");
 };
 
 export const resendRegisterVerification = async (
@@ -84,10 +100,32 @@ export const resendRegisterVerification = async (
 ) => {
   const email = String(req.body.email);
 
+  if (!email) {
+    res.status(400).json({
+      invalid: "No email given.",
+    });
+    return;
+  }
   const user = await User.findOne({ email });
 
   if (!user) {
-    res.status(400).send("Error: Invalid credencials");
+    res.status(400).json({
+      invalid: "There is no user with given email.",
+    });
+    return;
+  }
+
+  if (user.disabled) {
+    res.status(400).json({
+      invalid: "The email address has been disabled by Administrator",
+    });
+    return;
+  }
+
+  if (user.confirmed) {
+    res.status(400).json({
+      invalid: "This email has already been confirmed.",
+    });
     return;
   }
 
@@ -118,6 +156,13 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
+    if (user.disabled) {
+      res.status(400).json({
+        invalid: "The email address has been disabled by Administrator",
+      });
+      return;
+    }
+
     const passMatch = await bcrypt.compare(password, user.password);
 
     if (!passMatch) {
@@ -128,7 +173,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (!user.confirmed) {
       return res.status(401).json({
-        invalid: "This account is not confirmed",
+        unconfirmed:
+          "This account is not confirmed. Check your email and confirm registration.",
       });
     }
 
@@ -150,7 +196,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (e) {
     res.status(400).json({
-      invalid: e,
+      invalid: "Error, try later.",
     });
   }
 };
