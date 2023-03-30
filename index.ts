@@ -94,5 +94,5 @@ app.use(function (req, res, next) {
 });
 
 httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log("server started at http://localhost:" + PORT);
+  console.log("server started at http://chatme.networkmanager.pl/api" + PORT);
 });
