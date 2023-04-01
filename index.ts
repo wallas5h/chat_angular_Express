@@ -41,9 +41,10 @@ export const io = new Server(httpServer, {
     origin: [config.corsOrigin, "https://localhost:3001"],
     // origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
-  transports: ["websocket", "polling"],
+  // transports: ["websocket", "polling"],
 });
 
 app.use(cors(corsOptions));
