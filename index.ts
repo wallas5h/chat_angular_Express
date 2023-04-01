@@ -22,7 +22,7 @@ const PORT = 3001;
 connectDB();
 
 const corsOptions = {
-  origin: config.corsOrigin,
+  origin: [config.corsOrigin, "https://localhost:3001"],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -38,7 +38,7 @@ const httpServer = createServer(app);
 
 export const io = new Server(httpServer, {
   cors: {
-    origin: [config.corsOrigin],
+    origin: [config.corsOrigin, "https://localhost:3001"],
     // origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
     credentials: true,
