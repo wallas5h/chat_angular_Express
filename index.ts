@@ -41,6 +41,7 @@ export const io = new Server(httpServer, {
     origin: [config.corsOrigin],
     // origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
   // transports: ["websocket", "polling"],
