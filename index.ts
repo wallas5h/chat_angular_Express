@@ -19,10 +19,11 @@ import { userRouter } from "./routes/userRouter";
 require("dotenv").config();
 
 const PORT = 3001;
+const Host = config.host;
 connectDB();
 
 const corsOptions = {
-  origin: [config.corsOrigin, "https://localhost:3001"],
+  origin: [config.corsOrigin],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -38,13 +39,11 @@ const httpServer = createServer(app);
 
 export const io = new Server(httpServer, {
   cors: {
-    origin: [config.corsOrigin, "https://localhost:3001"],
-    // origin: ["http://localhost:3000"],
+    origin: [config.corsOrigin],
+    // origin: "*",
     methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
-  // transports: ["websocket", "polling"],
 });
 
 app.use(cors(corsOptions));
@@ -94,6 +93,15 @@ app.use(function (req, res, next) {
   next();
 });
 
-httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log("server started at http://chatme.networkmanager.pl:" + PORT);
+httpServer.listen(PORT, Host, () => {
+  console.log(`server started at ${Host}:` + PORT);
+});
+
+httpServer.on("error", (e) => {
+  if (e) {
+    setTimeout(() => {
+      httpServer.close();
+      httpServer.listen(PORT, Host);
+    }, 3000);
+  }
 });
