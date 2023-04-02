@@ -24,7 +24,7 @@ connectDB();
 
 const corsOptions = {
   origin: config.corsOrigin,
-  credentials: true,
+  // credentials: true,
   optionSuccessStatus: 200,
 };
 
@@ -42,7 +42,7 @@ export const io = new Server(httpServer, {
     origin: [config.corsOrigin],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
-    credentials: true,
+    // credentials: true,
   },
 });
 
