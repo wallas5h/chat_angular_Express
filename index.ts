@@ -19,12 +19,11 @@ import { userRouter } from "./routes/userRouter";
 require("dotenv").config();
 
 const PORT = 3001;
-const Host = config.host;
 connectDB();
 
 const corsOptions = {
   origin: [config.corsOrigin],
-  credentials: true,
+  // credentials: true,
   optionSuccessStatus: 200,
 };
 
@@ -42,7 +41,7 @@ export const io = new Server(httpServer, {
     origin: [config.corsOrigin],
     // origin: "*",
     methods: ["GET", "POST"],
-    credentials: true,
+    // credentials: true,
   },
 });
 
@@ -93,15 +92,4 @@ app.use(function (req, res, next) {
   next();
 });
 
-httpServer.listen(PORT, Host, () => {
-  console.log(`server started at ${Host}:` + PORT);
-});
-
-httpServer.on("error", (e) => {
-  if (e) {
-    setTimeout(() => {
-      httpServer.close();
-      httpServer.listen(PORT, Host);
-    }, 3000);
-  }
-});
+httpServer.listen(PORT);
