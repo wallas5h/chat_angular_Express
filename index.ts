@@ -23,8 +23,8 @@ connectDB();
 
 const corsOptions = {
   origin: [config.corsOrigin],
-  // credentials: true,
-  // optionSuccessStatus: 200,
+  credentials: true,
+  optionSuccessStatus: 200,
 };
 
 const limiter = rateLimit({
@@ -39,10 +39,10 @@ const httpServer = createServer(app);
 export const io = new Server(httpServer, {
   cors: {
     origin: [config.corsOrigin],
-    // origin: "*",
-    // methods: ["GET", "POST"],
-    // credentials: true,
+    credentials: true,
+    methods: ["GET", "POST"],
   },
+  transports: ["websocket", "polling"],
 });
 
 app.use(cors(corsOptions));
