@@ -36,15 +36,6 @@ const app = express();
 
 const httpServer = createServer(app);
 
-export const io = new Server(httpServer, {
-  cors: {
-    origin: [config.corsOrigin],
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-  transports: ["websocket", "polling"],
-});
-
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
@@ -59,9 +50,6 @@ app.use(
     extended: true,
   })
 );
-
-// socket.io service
-socketService(io);
 
 //routing
 app.use("/api/users", userRouter);
@@ -92,4 +80,16 @@ app.use(function (req, res, next) {
   next();
 });
 
-httpServer.listen(PORT);
+httpServer.listen(PORT, "0.0.0.0");
+
+export const io = new Server(httpServer, {
+  cors: {
+    origin: [config.corsOrigin],
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+  transports: ["websocket", "polling"],
+});
+
+// socket.io service
+socketService(io);
