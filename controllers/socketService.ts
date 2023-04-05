@@ -35,7 +35,7 @@ export const socketService = async (io: Server) => {
   //   })
   // );
 
-  await io.sockets.on("connection", (socket) => {
+  await io.on("connection", (socket) => {
     exportSocket = socket;
 
     socket.on("new-user", async () => {
