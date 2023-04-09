@@ -2,3 +2,7 @@
 config/config.ts
 .env
 /dist
+key.pem
+cert.pem
+index2.ts
+index3.ts
