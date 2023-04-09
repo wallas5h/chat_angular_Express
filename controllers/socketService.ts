@@ -1,5 +1,6 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { cloudinary } from "../index";
+// import { cloudinary } from "../index2";
 
 import { Message } from "../models/Message";
 import { Room } from "../models/Room";
@@ -24,8 +25,6 @@ interface sortedMessagesDto {
   messagesByDate: MessageDto[];
 }
 
-export let exportSocket: any;
-
 export const socketService = async (io: Server) => {
   // io.use(
   //   socketioJwt.authorize({
@@ -35,9 +34,8 @@ export const socketService = async (io: Server) => {
   //   })
   // );
 
-  await io.on("connection", (socket) => {
-    exportSocket = socket;
-
+  await io.on("connection", (socket: Socket) => {
+    // console.log("connected");
     socket.on("new-user", async () => {
       socket.emit("new-user", "działa");
     });
