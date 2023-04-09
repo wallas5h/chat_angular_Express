@@ -152,7 +152,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(400).json({
-        invalid: "Invalid email or password",
+        invalid: "User not found. Go to register page.",
       });
     }
 
