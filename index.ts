@@ -5,8 +5,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import "express-async-errors";
+import { engine } from "express-handlebars";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
+import path from "path";
 import { Server } from "socket.io";
 import { config } from "./config/config";
 import { connectDB } from "./config/db";
@@ -17,12 +19,13 @@ import { userRouter } from "./routes/userRouter";
 require("dotenv").config();
 
 const PORT = 3001;
+const Host = config.host;
 connectDB();
 
 const corsOptions = {
   origin: config.corsOrigin,
   credentials: true,
-  optionSuccessStatus: 200,
+  // optionSuccessStatus: 200,
 };
 
 const limiter = rateLimit({
@@ -37,11 +40,9 @@ const httpServer = createServer(app);
 export const io = new Server(httpServer, {
   cors: {
     origin: [config.corsOrigin],
-    // origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
     credentials: true,
+    // methods: ["GET", "POST"],
   },
-  transports: ["websocket", "polling"],
 });
 
 app.use(cors(corsOptions));
@@ -67,6 +68,13 @@ app.use("/api/users", userRouter);
 app.use("/api/rooms", roomsRouter);
 app.use("/api/messages", messagesRouter);
 
+// handlebars
+const hbsPath = path.join(__dirname, "./views");
+
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", hbsPath);
+
 //Cloudinary
 export const cloudinary = require("cloudinary").v2;
 cloudinary.config({
@@ -84,6 +92,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log("server started at http://localhost:" + PORT);
+httpServer.listen(PORT, Host, () => {
+  console.log(`server started at ${Host}:` + PORT);
 });

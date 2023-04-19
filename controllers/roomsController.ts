@@ -77,7 +77,7 @@ export const addUserToDislikeList = async (req: any, res: Response) => {
   }
 
   room.dislikeMembers.push(req.user.id);
-  room.save();
+  await room.save();
 
   await getRooms(req, res);
 };
@@ -110,7 +110,7 @@ export const disActiveRoom = async (req: Request, res: Response) => {
   }
 
   room.isActive = false;
-  room.save();
+  await room.save();
 
   await getRooms(req, res);
 };
